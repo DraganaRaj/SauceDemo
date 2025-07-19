@@ -1,11 +1,16 @@
 package inventory;
 
 import base.BaseTest;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.InventoryPage;
 import pages.LoginPage;
+
+import java.time.Duration;
 
 public class InventoryTest extends BaseTest {
 
@@ -53,6 +58,11 @@ public class InventoryTest extends BaseTest {
     public void removeProductFromCartRemovesBadge() {
         inventoryPage.addToCart("Sauce Labs Backpack");
         inventoryPage.removeFromCart("Sauce Labs Backpack");
+
+        // Wait for badge to disappear
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("shopping_cart_badge")));
+
         Assert.assertEquals(inventoryPage.getCartBadgeCount(), 0, "Cart badge should be removed.");
     }
 
@@ -62,8 +72,7 @@ public class InventoryTest extends BaseTest {
     @Test
     public void navigateToCartFromInventory() {
         inventoryPage.openCart();
-        String url = driver.getCurrentUrl();
-        Assert.assertTrue(url.contains("cart"), "Not navigated to cart page.");
+        Assert.assertTrue(driver.getCurrentUrl().contains("cart.html"), "Not navigated to cart page.");
     }
 
     /**
@@ -72,8 +81,13 @@ public class InventoryTest extends BaseTest {
     @Test
     public void logoutShouldReturnToLoginPage() {
         inventoryPage.logout();
-        String currentUrl = driver.getCurrentUrl();
-        Assert.assertTrue(currentUrl.contains("saucedemo.com"), "User is not logged out.");
+
+        // Wait for login field to be visible after logout
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("user-name")));
+
+        boolean isUsernameFieldVisible = driver.findElements(By.id("user-name")).size() > 0;
+        Assert.assertTrue(isUsernameFieldVisible, "User is not redirected to login page after logout.");
     }
 
     /**

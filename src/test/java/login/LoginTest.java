@@ -82,4 +82,17 @@ public class LoginTest extends BaseTest {
         InventoryPage inventoryPage = new InventoryPage(driver);
         Assert.assertEquals(inventoryPage.getPageTitle(), "Products", "Visual user login failed.");
     }
+
+    /**
+     * Attempts login with standard_user and an incorrect password,
+     * and verifies that an error message is displayed.
+     */
+    @Test
+    public void loginWithIncorrectPassword() {
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.login("standard_user", "wrong_password");
+        Assert.assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed for incorrect password.");
+    }
+
+
 }
